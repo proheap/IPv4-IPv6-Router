@@ -1,4 +1,5 @@
 # IPv4 and IPv6 Router
+[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-393/)
 IPv4 and IPv6 router with the possibility of static paths and support for the CDP/LLDP protocol.
 
 ---
@@ -14,7 +15,7 @@ IPv4 and IPv6 router with the possibility of static paths and support for the CD
 ### ASSIGNMENT
 IPv4 and IPv6 router with the possibility:
 
-- add / remove routes to routing table
+- add/remove routes to routing table
 - static paths
 - support for the CDP/LLDP protocol
 
