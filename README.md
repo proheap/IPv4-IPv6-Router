@@ -24,14 +24,14 @@ IPv4 and IPv6 router with the possibility:
 
 - #### pip:
 
-	    pip -r requirements.txt
-	    python -m flask run
+	    pip3 -r requirements.txt
+	    python3 -m flask run
 		
 - #### pipenv:	
 	 
-        pipenv run python -m flask run	
+        pipenv run python3 -m flask run	
 		
-#### API available on:
+#### REST API available on:
 	http://localhost/api
 	
 ---
