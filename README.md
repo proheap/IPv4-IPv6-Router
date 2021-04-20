@@ -22,11 +22,13 @@ IPv4 and IPv6 router with the possibility:
 ### RUNNING APLICATION
 
 #### Start the server:
-##### pip:
+
+- pip:
 	pip -r requirements.txt
 	python -m flask run
-##### pipenv:	
+- pipenv:	
 	pipenv run python -m flask run	
+	
 #### API available on:
 	http://localhost/api
 #### Swagger documentation available on:
