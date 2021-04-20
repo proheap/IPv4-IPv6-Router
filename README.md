@@ -24,7 +24,7 @@ IPv4 and IPv6 router with the possibility:
 
 - #### pip:
 
-	    pip3 -r requirements.txt
+	    pip3 install -r requirements.txt
 	    python3 -m flask run
 		
 - #### pipenv:	
