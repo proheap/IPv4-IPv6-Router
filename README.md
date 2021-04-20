@@ -1,7 +1,7 @@
 # IPv4 and IPv6 Router
 IPv4 and IPv6 router with the possibility of static paths and support for the CDP/LLDP protocol.
 
-----------------------------------------------------------------------------------------------------------------------------------
+---
 ### AUTHORS
 - Martin Mišík
 - Mária Činčuráková
@@ -10,7 +10,7 @@ IPv4 and IPv6 router with the possibility of static paths and support for the CD
 ### VERSION
 - 0.1
 
-----------------------------------------------------------------------------------------------------------------------------------
+---
 ### ASSIGNMENT
 IPv4 and IPv6 router with the possibility:
 
@@ -18,20 +18,20 @@ IPv4 and IPv6 router with the possibility:
 - static paths
 - support for the CDP/LLDP protocol
 
-----------------------------------------------------------------------------------------------------------------------------------
+---
 ### RUNNING APLICATION
-
 #### Start the server:
 
-- pip:
-	pip -r requirements.txt
-	python -m flask run
-- pipenv:	
-	pipenv run python -m flask run	
-	
+- #### pip:
+
+	    pip -r requirements.txt
+	    python -m flask run
+		
+- #### pipenv:	
+	 
+        pipenv run python -m flask run	
+		
 #### API available on:
 	http://localhost/api
-#### Swagger documentation available on:
-	http://localhost/apidocs
 	
-----------------------------------------------------------------------------------------------------------------------------------
+---
