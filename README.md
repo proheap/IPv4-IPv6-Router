@@ -1,6 +1,6 @@
 # IPv4 and IPv6 Router
-[![Version 0.1](https://img.shields.io/badge/version-v0.1-red.svg)]()  
-[![Python 3.9](https://img.shields.io/badge/python-v3.9-green.svg)](https://www.python.org/downloads/release/python-393/)
+[![Version 0.1](https://img.shields.io/badge/version-v0.1-red.svg)]()
+[![Python 3.9](https://img.shields.io/badge/python-v3.9-green.svg)](https://www.python.org/downloads/release/python-393/)  
 IPv4 and IPv6 router with the possibility of static paths and support for the CDP/LLDP protocol.
 
 ---
