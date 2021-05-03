@@ -1,6 +1,6 @@
 # LLDP Ethernet Protocol:
 LLDP = {
-    "DST_MAC": "01:80:c2:00:00:0e", # LLDP destination MAC
+    "DST_MAC": "01:80:c2:00:00:0e", # LLDP Destination MAC
     "PROTO_ID": 0x88cc,             # LLDP Protocol ID
     "HOLD_TIME": 120,               # LLDP Timers
     "PACKET_FREQUENCY_TIMER": 30
