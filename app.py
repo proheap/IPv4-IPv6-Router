@@ -1,11 +1,13 @@
 from flask import Flask, Blueprint
 
 from configs.app_config import HTTP_API
-from src.routes.entrance_route import entrance
+from src.routes.api_route import api
+from src.routes.router_route import router_bp
 
 def create_app():
     app = Flask(__name__, template_folder=HTTP_API.get('template_folder'))
-    app.register_blueprint(entrance)
+    app.register_blueprint(api)
+    app.register_blueprint(router_bp)
     return app
 
 if __name__ == '__main__':

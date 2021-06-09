@@ -2,8 +2,8 @@ from flask import Blueprint, render_template
 
 import src.templates
 
-entrance = Blueprint('entrance', __name__)
+api = Blueprint('api', __name__, url_prefix='/api')
 
-@entrance.route('/api', methods=['GET', 'PUT'])
+@api.route('', methods=['GET', 'PUT'])
 def default_page():
    return render_template('index.html')

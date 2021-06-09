@@ -2,7 +2,8 @@ import socket
 import struct
 import threading
 import ipaddress
-from pyroute2 import IPRoute, NetlinkError
+from pyroute2 import IPRoute
+from pyroute2.netlink.exceptions import NetlinkError
 
 from src.helpers.conversion_helper import maskToPrefix
 
@@ -36,7 +37,7 @@ class Router():
             if sock.getsockname() == (ip, port):
                 print (f'Socket {ip}:{port} was already open!')
                 return False
-        sock = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
+        sock = socket.socket(socket.AF_PACKET, socket.SOCK_DGRAM)
 
         # Bind to the port
         sock.bind((ip, port))
@@ -85,17 +86,17 @@ class Router():
                                             "hoplimit": 16})
                 print(f'{ip}/{prefix} {str(interface.ip)} -> ROUTE ADDED')
                 return True
-            except NetlinkError as e:
-                if e.code == 17:
+            except NetlinkError as error:
+                if error.code == 17:
                     print(f'IP Address {ip} already exists.')
                 else:
-                    raise e
+                    raise error
         else:
             return False
         return True
 
-    def removeRoute(self, ip, mask, nextHop):
-        # Removing route from linux routing table
+    def deleteRoute(self, ip, mask, nextHop):
+        # Deleting route from linux routing table
         prefix = maskToPrefix(mask)
         assignedInt = False
 
@@ -114,9 +115,9 @@ class Router():
                                     gateway=str(interface.ip))
                 print(f'{ip}/{prefix} {str(interface.ip)} -> ROUTE REMOVED')
                 return True
-            except NetlinkError as e:
-                if e.code == 3:
+            except NetlinkError as error:
+                if error.code == 3:
                     print(f'IP Address {ip} doesn`t exists.')
                 else:
-                    raise e
+                    raise error
         return False
