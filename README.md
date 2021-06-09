@@ -1,7 +1,7 @@
 # IPv4 and IPv6 Router  
 ![Python](https://img.shields.io/badge/Python-14354C?style=flat-square&logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-000000?color=161616&style=flat-square&logo=flask&logoColor=white)
-[![Latest 0.1](https://img.shields.io/badge/latest-v0.1-red.svg?style=flat-square)](https://bitbucket.org/proheap/ipv4-ipv6-router/)
+[![Latest 0.2](https://img.shields.io/badge/latest-v0.2-red.svg?style=flat-square)](https://bitbucket.org/proheap/ipv4-ipv6-router/)
 [![Python 3.9](https://img.shields.io/badge/python-v3.9-green.svg?style=flat-square)](https://www.python.org/downloads/release/python-393/)  
 IPv4 and IPv6 router with the possibility of static paths and support for the CDP/LLDP protocol.
 
@@ -12,14 +12,13 @@ IPv4 and IPv6 router with the possibility of static paths and support for the CD
 - *Michal Hraška*
 
 ### VERSION
-- *0.1*
+- *0.2*
 
 ---
 ### ASSIGNMENT
 IPv4 and IPv6 router with the possibility:
 
 - add/remove routes to routing table
-- static paths
 - support for the CDP/LLDP protocol
 
 ---
@@ -36,6 +35,6 @@ IPv4 and IPv6 router with the possibility:
         pipenv run python -m flask run	
 		
 #### REST API available on:
-	http://localhost/api
+	http://localhost:8080/api
 	
 ---
