@@ -2,7 +2,7 @@ import struct
 
 from src.models.lldp_model import *
 from src.helpers.conversion_helper import macFromBytes
-from src.models.ethFrame_model import ETH_frame
+from src.models.eth_model import ETH_frame
 
 def parseFrame(frame):
     ethType, = struct.unpack('!H', frame[12:14])
