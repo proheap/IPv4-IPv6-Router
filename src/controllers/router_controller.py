@@ -64,7 +64,7 @@ class Router():
                 return True
         return False
 
-    def addRoute(self, ip, mask, nextHop):
+    def addRoute(self, ip, mask, nextHop, metric):
 		# Adding route to linux routing table
         prefix = maskToPrefix(mask)
         assignedInt = False
@@ -82,8 +82,7 @@ class Router():
                                     dst=ip,
                                     mask=prefix,
                                     gateway=str(interface.ip),
-                                    metrics={"mtu": 1400,
-                                            "hoplimit": 16})
+                                    metrics={"mtu": metric})
                 print(f'{ip}/{prefix} {str(interface.ip)} -> ROUTE ADDED')
                 return True
             except NetlinkError as error:

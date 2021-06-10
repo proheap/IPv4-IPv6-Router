@@ -16,7 +16,7 @@ def add_route():
 def delete_route():
     if request.method == 'PUT':
         data = request.get_json()
-        if router.deleteRoute(data['prefix'], data['mask'], data['nextHop'], data['metric']):
+        if router.deleteRoute(data['prefix'], data['mask'], data['nextHop']):
             return jsonify({"success": True}), 201
         return jsonify({"error": "Could not create"}), 404
     elif request.method == 'DELETE':
