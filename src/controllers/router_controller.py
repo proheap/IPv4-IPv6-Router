@@ -1,11 +1,16 @@
 import socket
-import struct
-import threading
 import ipaddress
+import threading
 from pyroute2 import IPRoute
 from pyroute2.netlink.exceptions import NetlinkError
 
 from src.helpers.conversion_helper import maskToPrefix
+from src.helpers.promiscuous_helper import setPromiscuousMode
+from src.controllers.lldp_controller import LLDP
+from src.models.interface_model import Interface
+
+# Linux values
+ETH_P_ALL               = 0x0003
 
 class Router():
     def __init__(self):
@@ -15,6 +20,8 @@ class Router():
         self.interfaces = []
         self.addInterfaces()
 
+        self.enableLLDP = False
+
     def addInterfaces(self):
             # Adding interfaces to list using module pyroute2
             addresses = ()
@@ -22,40 +29,44 @@ class Router():
 
             print("Added interfaces:")
             for address in addresses:
-                ip = [x[1]
-                    for x in address["attrs"] if x[0] == "IFA_ADDRESS"][0]
-                prefix = address["prefixlen"]
-                int_name = [x[1]
-                    for x in address["attrs"] if x[0] == "IFA_LABEL"][0]
-                print(f'{ip}/{prefix} [{int_name}]')
+                ip = address.get_attrs('IFA_ADDRESS')[0]
+                prefix = address['prefixlen']
+                intLabel = address.get_attrs('IFA_LABEL')[0]
+                link = self.iproute.get_links(ifname=intLabel)
+                mac = [x[1]
+				    for x in link["attrs"] if x[0] == "IFLA_ADDRESS"][0]
+                print(f'{ip}/{prefix} [{intLabel}: {mac}]')
+                self.interfaces.append(Interface(ipaddress.IPv4Interface(f'{ip}/{prefix}'), intLabel, mac))
 
-                self.interfaces.append(ipaddress.IPv4Interface(f'{ip}/{prefix}'))
-
-    def createSocket(self, ip, port):
-        # Create socket with 'ip' on 'port'
+    def createSocket(self, interface):
+        intLabel = interface.label
+        # Create socket on interface
         for sock in self.activeSockets:
-            if sock.getsockname() == (ip, port):
-                print (f'Socket {ip}:{port} was already open!')
+            if sock.getsockname() == (intLabel, 0):
+                print (f'Socket {intLabel} was already open!')
                 return False
-        sock = socket.socket(socket.AF_PACKET, socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(ETH_P_ALL))
 
         # Bind to the port
-        sock.bind((ip, port))
+        sock.bind((intLabel, 0))
 
         # Append socket to active socket list
         self.activeSockets.append(sock)
-        print (f'{self.activeSockets[-1].getsockname()[0]}:{self.activeSockets[-1].getsockname()[1]} -> SOCKET ADDED')
+        interface.sock = sock
+        print (f'{intLabel} -> SOCKET ADDED')
         return True
 
-    def closeSocket(self, ip, port):
+    def closeSocket(self, interface):
+        intLabel = interface.label
         # Closing socket with 'ip' on 'port'
         for sock in self.activeSockets:
-            if sock.getsockname() == (ip, port):
+            if sock.getsockname() == (intLabel, 0):
                 sock.close()
                 self.activeSockets.remove(sock)
-                print (f'{ip}:{port} -> SOCKET CLOSED')
+                interface.sock = 0
+                print (f'{intLabel} -> SOCKET CLOSED')
                 return True
-        print (f'Socket {ip}:{port} wasn`t open!')
+        print (f'Socket {intLabel} wasn`t open!')
         return False
 
     def findSocket(self, ip, port):
@@ -70,9 +81,9 @@ class Router():
         assignedInt = False
 
         for i in range(len(self.interfaces)):
-            int_network = self.interfaces[i].network
+            int_network = self.interfaces[i].ip.network
             if ipaddress.IPv4Address(nextHop) in int_network:
-                interface = self.interfaces[i]
+                interface = self.interfaces[i].ip
                 assignedInt = True
             if ipaddress.IPv4Network(f'{ip}/{prefix}') == int_network:
                 return False
@@ -100,9 +111,9 @@ class Router():
         assignedInt = False
 
         for i in range(len(self.interfaces)):
-            int_network = self.interfaces[i].network
+            int_network = self.interfaces[i].ip.network
             if ipaddress.IPv4Address(nextHop) in int_network:
-                interface = self.interfaces[i]
+                interface = self.interfaces[i].ip
                 assignedInt = True
                 break
 
@@ -120,3 +131,17 @@ class Router():
                 else:
                     raise error
         return False
+
+    def startLLDP(self):
+        self.enableLLDP = True
+        # Creating LLDP class for LLDP protocol
+        lldp = LLDP(self.activeSockets)
+        # Creating sockets for every interface
+        for interface in self.interfaces:
+            self.createSocket(interface)
+            # Set promiscuous mode
+            setPromiscuousMode(interface)
+            # Recieving LLDP packets
+            tRecv = threading.Thread(target=lldp.receivePacket, args=(interface,))
+            tRecv.start()
+        

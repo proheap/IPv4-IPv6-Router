@@ -1,10 +1,10 @@
 import struct
 
-from src.models.lldp_model import *
 from src.helpers.conversion_helper import macFromBytes
+from src.models.lldp_model import *
 from src.models.eth_model import ETH_frame
 
-def parseFrame(frame):
+def parseFrame(frame, interface):
     ethType, = struct.unpack('!H', frame[12:14])
     if ethType != LLDP_PROTO_ID:
         return None
@@ -20,11 +20,14 @@ def parseFrame(frame):
         if tlvType == LLDP_TLV_TYPE_PDUEND:
             break
         elif tlvType == LLDP_TLV_TYPE_CHASSISID:
-            parsedFrame.addPayload(TLV_chassis(macFromBytes(lldp[3:9])))
+            chasisID = macFromBytes(lldp[3:9])
             lldp = lldp[9:]
         elif tlvType == LLDP_TLV_TYPE_PORTID:
-            parsedFrame.addPayload(TLV_port(lldp[3:2 + tlvLen].decode()))
+            portID = lldp[3:2 + tlvLen].decode()
+            lldp = lldp[2 + tlvLen:] 
+        elif tlvType == LLDP_TLV_TYPE_CAP:  
+            capability = lldp[3:2 + tlvLen].decode()
             lldp = lldp[2 + tlvLen:] 
         else:
             lldp = lldp[2 + tlvLen:] 
-    parsedFrame.print()
+    return LLDP_entry(chasisID, interface, portID)

@@ -18,6 +18,7 @@ LLDP_TLV_TYPE_PDUEND    = 0x00
 LLDP_TLV_TYPE_CHASSISID = 0x01
 LLDP_TLV_TYPE_PORTID    = 0x02
 LLDP_TLV_TYPE_TTL       = 0x03
+LLDP_TLV_TYPE_CAP       = 0x07
 # LLDP Timers:
 LLDP_HOLD_TIME          = 120
 LLDP_PACKET_FREQUENCY   = 30
@@ -73,3 +74,14 @@ class TLV_ttl(LLDP_TLV):
 class TLV_end(LLDP_TLV):
     def __init__(self):
         super().__init__(LLDP_TLV_TYPE_PDUEND)
+
+class LLDP_entry(object):
+    def __init__(self, deviceID, localInt, portID, holdtime=120, capability="-"):
+        self.deviceID = deviceID
+        self.localInt = localInt
+        self.holdtime = holdtime
+        self.capability = capability
+        self.portID = portID
+
+    def print(self):
+        print(f'{self.deviceID}\t{self.localInt}\t{self.holdtime}\t{self.capability}\t{self.portID}')
