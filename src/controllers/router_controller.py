@@ -32,11 +32,12 @@ class Router():
                 ip = address.get_attrs('IFA_ADDRESS')[0]
                 prefix = address['prefixlen']
                 intLabel = address.get_attrs('IFA_LABEL')[0]
-                link = self.iproute.get_links(ifname=intLabel)
+                link = self.iproute.get_links(ifname=intLabel)[0]
                 mac = [x[1]
-				    for x in link["attrs"] if x[0] == "IFLA_ADDRESS"][0]
-                print(f'{ip}/{prefix} [{intLabel}: {mac}]')
-                self.interfaces.append(Interface(ipaddress.IPv4Interface(f'{ip}/{prefix}'), intLabel, mac))
+				     for x in link["attrs"] if x[0] == 'IFLA_ADDRESS'][0]
+                if intLabel != "lo":
+                    print(f'{ip}/{prefix} [{intLabel}: {mac}]')
+                    self.interfaces.append(Interface(ipaddress.IPv4Interface(f'{ip}/{prefix}'), intLabel, mac))
 
     def createSocket(self, interface):
         intLabel = interface.label
