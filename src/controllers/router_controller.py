@@ -90,13 +90,14 @@ class Router():
         prefix = maskToPrefix(mask)
         assignedInt = False
 
-        for i in range(len(self.interfaces)):
-            int_network = self.interfaces[i].ip.network
-            if ipaddress.IPv4Address(nextHop) in int_network:
-                interface = self.interfaces[i].ip
-                assignedInt = True
-            if ipaddress.IPv4Network(f'{ip}/{prefix}') == int_network:
-                return False
+        for i in self.interfaces:
+            if i.ip is not None:
+                int_network = i.ip.network
+                if ipaddress.IPv4Address(nextHop) in int_network:
+                    interface = i.ip
+                    assignedInt = True
+                if ipaddress.IPv4Network(f'{ip}/{prefix}') == int_network:
+                    return False
         if assignedInt == True:
             try:
                 self.iproute.route("add",
@@ -120,10 +121,10 @@ class Router():
         prefix = maskToPrefix(mask)
         assignedInt = False
 
-        for i in range(len(self.interfaces)):
-            int_network = self.interfaces[i].ip.network
+        for i in self.interfaces:
+            int_network = i.ip.network
             if ipaddress.IPv4Address(nextHop) in int_network:
-                interface = self.interfaces[i].ip
+                interface = i.ip
                 assignedInt = True
                 break
 
