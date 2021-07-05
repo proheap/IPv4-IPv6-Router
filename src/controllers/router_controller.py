@@ -133,16 +133,22 @@ class Router():
                     raise error
         return False
 
-    def startLLDP(self):
-        self.enableLLDP = True
-        # Creating LLDP class for LLDP protocol
-        lldp = LLDP(self.activeSockets)
-        # Creating sockets for every interface
-        for interface in self.interfaces:
-            self.createSocket(interface)
-            # Set promiscuous mode
-            setPromiscuousMode(interface)
-            # Recieving LLDP packets
-            tRecv = threading.Thread(target=lldp.receivePacket, args=(interface,))
-            tRecv.start()
-        
+    def runLLDP(self):
+        if self.enableLLDP != False:
+            self.enableLLDP = True
+            # Creating LLDP class for LLDP protocol
+            self.lldp = LLDP(self.activeSockets)
+            # Creating sockets for every interface
+            for interface in self.interfaces:
+                self.createSocket(interface)
+                # Set promiscuous mode
+                setPromiscuousMode(interface)
+                # Recieving LLDP packets
+                tRecv = threading.Thread(target=self.lldp.receivePacket, args=(interface,))
+                tRecv.start()
+                # Sending LLDP packets
+                tSend = threading.Thread(target=self.lldp.sendPacket, args=(interface,))
+                tSend.start()
+    
+    def getLLDPTable(self):
+        return self.lldp.getLLDPTable()

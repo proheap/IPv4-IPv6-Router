@@ -22,6 +22,8 @@ LLDP_TLV_TYPE_CAP       = 0x07
 # LLDP Timers:
 LLDP_HOLD_TIME          = 120
 LLDP_PACKET_FREQUENCY   = 30
+# LLDP TTL:
+LLDP_TLV_TTL            = 120
 
 class LLDP_TLV(object):
     def __init__(self, tlvType):
@@ -63,7 +65,7 @@ class TLV_port(LLDP_TLV):
         print(f'    TLV Port: Port ID: {self.tlvPortID}')
 
 class TLV_ttl(LLDP_TLV):
-    def __init__(self, ttl):
+    def __init__(self, ttl=LLDP_TLV_TTL):
         LLDP_TLV.__init__(self, LLDP_TLV_TYPE_TTL)
         self.tlvLength = 2
         self.tlvTTL = ttl
@@ -82,6 +84,15 @@ class LLDP_entry(object):
         self.holdtime = holdtime
         self.capability = capability
         self.portID = portID
+
+    def getJSON(self):
+        jsonLLDPEntry = dict()
+        jsonLLDPEntry['deviceID'] = self.deviceID
+        jsonLLDPEntry['localInt'] = self.localInt
+        jsonLLDPEntry['holdtime'] = self.holdtime
+        jsonLLDPEntry['capability'] = self.capability
+        jsonLLDPEntry['portID'] = self.portID
+        return jsonLLDPEntry
 
     def print(self):
         print(f'{self.deviceID}\t{self.localInt}\t{self.holdtime}\t{self.capability}\t{self.portID}')

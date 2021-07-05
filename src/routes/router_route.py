@@ -12,12 +12,9 @@ def add_route():
         return jsonify({"success": True}), 201
     return jsonify({"error": "Could not create"}), 404
 
-@router_bp.route('route/delete/<int:id>', methods=['PUT', 'DELETE'])
+@router_bp.route('route/delete', methods=['PUT'])
 def delete_route():
-    if request.method == 'PUT':
-        data = request.get_json()
-        if router.deleteRoute(data['prefix'], data['mask'], data['nextHop']):
-            return jsonify({"success": True}), 201
-        return jsonify({"error": "Could not create"}), 404
-    elif request.method == 'DELETE':
-        return jsonify({"error": "Could not create"}), 404
+    data = request.get_json()
+    if router.deleteRoute(data['prefix'], data['mask'], data['nextHop']):
+        return jsonify({"success": True}), 201
+    return jsonify({"error": "Could not create"}), 404
