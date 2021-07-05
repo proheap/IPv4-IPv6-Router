@@ -26,14 +26,16 @@ class Router():
     def addInterfaces(self):
             # Adding interfaces to list using module pyroute2
             links = ()
-            links = self.iproute.get_links(family=2)
+            links = self.iproute.get_links(family=socket.AF_INET)
 
             print("Added interfaces:")
             for link in links:
                 mac = link.get_attrs('IFLA_ADDRESS')[0]
                 ifName = link.get_attrs('IFLA_IFNAME')[0]
+                index = link['index']
                 
-                address = self.iproute.get_addr(label=ifName)
+                # IPv4
+                address = self.iproute.get_addr(index=index, family=socket.AF_INET)
                 if address:
                     address = address[0]
                     ip = [x[1]
@@ -41,12 +43,21 @@ class Router():
                     prefix = address['prefixlen']
                     ipv4 = ipaddress.IPv4Interface(f'{ip}/{prefix}')
                 else:
-                    ip = "-"
-                    prefix = "-"
                     ipv4 = None
+                # IPv6
+                address = self.iproute.get_addr(index=index, family=socket.AF_INET6)
+                if address:
+                    address = address[0]
+                    ip = [x[1]
+                        for x in address['attrs'] if x[0] == 'IFA_ADDRESS'][0]
+                    ipv6 = ipaddress.IPv6Interface(ip)
+                else:
+                    ipv6 = None
+                # Creating interface models
                 if ifName != "lo":
-                    print(f'{ip}/{prefix} [{ifName}: {mac}]')
-                    self.interfaces.append(Interface(ipv4, ifName, mac))
+                    interface = Interface(ifName, mac, ipv4, ipv6)
+                    interface.print()
+                    self.interfaces.append(interface)
 
     def createSocket(self, interface):
         intLabel = interface.name
@@ -85,16 +96,16 @@ class Router():
                 return True
         return False
 
-    def addRoute(self, ip, mask, nextHop, metric):
+    def addIPv4Route(self, ip, mask, nextHop, metric):
 		# Adding route to linux routing table
         prefix = maskToPrefix(mask)
         assignedInt = False
 
         for i in self.interfaces:
-            if i.ip is not None:
-                int_network = i.ip.network
+            if i.ipv4 is not None:
+                int_network = i.ipv4.network
                 if ipaddress.IPv4Address(nextHop) in int_network:
-                    interface = i.ip
+                    interface = i.ipv4
                     assignedInt = True
                 if ipaddress.IPv4Network(f'{ip}/{prefix}') == int_network:
                     return False
@@ -116,15 +127,15 @@ class Router():
             return False
         return True
 
-    def deleteRoute(self, ip, mask, nextHop):
+    def deleteIPv4Route(self, ip, mask, nextHop):
         # Deleting route from linux routing table
         prefix = maskToPrefix(mask)
         assignedInt = False
 
         for i in self.interfaces:
-            int_network = i.ip.network
+            int_network = i.ipv4.network
             if ipaddress.IPv4Address(nextHop) in int_network:
-                interface = i.ip
+                interface = i.ipv4
                 assignedInt = True
                 break
 
@@ -135,6 +146,64 @@ class Router():
                                     mask=prefix,
                                     gateway=str(interface.ip))
                 print(f'{ip}/{prefix} {str(interface.ip)} -> ROUTE REMOVED')
+                return True
+            except NetlinkError as error:
+                if error.code == 3:
+                    print(f'IP Address {ip} doesn`t exists.')
+                else:
+                    raise error
+        return False
+    
+    def addIPv6Route(self, ip, prefix, nextHop, metric):
+		# Adding route to linux routing table
+        assignedInt = False
+
+        for i in self.interfaces:
+            if i.ipv6 is not None:
+                int_network = i.ipv6.network
+                if ipaddress.IPv6Address(nextHop) in int_network:
+                    interface = i
+                    intIndex = self.iproute.link_lookup(ifname=interface.name)
+                    assignedInt = True
+                if ipaddress.IPv6Network(f'{ip}/{prefix}') == int_network:
+                    return False
+        if assignedInt == True:
+            try:
+                self.iproute.route("add",
+                                    dst=ip,
+                                    mask=prefix,
+                                    oif=intIndex,
+                                    metrics={"mtu": metric})
+                print(f'{ip}/{prefix} {interface.name} -> ROUTE ADDED')
+                return True
+            except NetlinkError as error:
+                if error.code == 17:
+                    print(f'IP Address {ip} already exists.')
+                else:
+                    raise error
+        else:
+            return False
+        return True
+    
+    def deleteIPv6Route(self, ip, prefix, nextHop):
+        # Deleting route from linux routing table
+        assignedInt = False
+
+        for i in self.interfaces:
+            int_network = i.ipv6.network
+            if ipaddress.IPv6Address(nextHop) in int_network:
+                interface = i
+                intIndex = self.iproute.link_lookup(ifname=interface.name)
+                assignedInt = True
+                break
+
+        if assignedInt == True:
+            try:
+                self.iproute.route("delete",
+                                    dst=ip,
+                                    mask=prefix,
+                                    oif=intIndex)
+                print(f'{ip}/{prefix} {interface.name} -> ROUTE REMOVED')
                 return True
             except NetlinkError as error:
                 if error.code == 3:
