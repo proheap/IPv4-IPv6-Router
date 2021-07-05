@@ -11,7 +11,7 @@ class ifreq(ctypes.Structure):
 
 def setPromiscuousMode(interface):
     ifr = ifreq()
-    ifr.ifr_ifrn = interface.intName.encode()
+    ifr.ifr_ifrn = interface.name.encode()
     fcntl.ioctl(interface.sock.fileno(), SIOCGIFFLAGS, ifr)
     ifr.ifr_flags |= IFF_PROMISC
     fcntl.ioctl(interface.sock.fileno(), SIOCSIFFLAGS, ifr)

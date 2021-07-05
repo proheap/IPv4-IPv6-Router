@@ -1,11 +1,12 @@
 import struct
 
-from src.helpers.conversion_helper import macFromBytes
+from src.helpers.conversion_helper import macFromBytes, capabilityFromBytes
 from src.models.lldp_model import *
 from src.models.eth_model import ETH_frame
 
-def parseFrame(frame, interface):
+def parseLLDPFrame(frame, intName):
     ethType, = struct.unpack('!H', frame[12:14])
+    # Checking LLDP protocol
     if ethType != LLDP_PROTO_ID:
         return None
     parsedFrame = ETH_frame(macFromBytes(frame[6:12]))
@@ -13,6 +14,7 @@ def parseFrame(frame, interface):
     frameLength = len(frame)
     lldp = frame[14:frameLength]
 
+    capability = "-"
     while True:
         tl, = struct.unpack('!H', lldp[0:2])
         tlvType = tl >> LLDP_TLV_LEN_BIT_LEN
@@ -26,8 +28,8 @@ def parseFrame(frame, interface):
             portID = lldp[3:2 + tlvLen].decode()
             lldp = lldp[2 + tlvLen:] 
         elif tlvType == LLDP_TLV_TYPE_CAP:  
-            capability = lldp[3:2 + tlvLen].decode()
+            capability = capabilityFromBytes(lldp[3:2 + tlvLen])
             lldp = lldp[2 + tlvLen:] 
         else:
             lldp = lldp[2 + tlvLen:] 
-    return LLDP_entry(chasisID, interface, portID)
+    return LLDP_entry(chasisID, intName, portID, capability)

@@ -21,26 +21,35 @@ class Router():
         self.addInterfaces()
 
         self.enableLLDP = False
+        self.lldp = None
 
     def addInterfaces(self):
             # Adding interfaces to list using module pyroute2
-            addresses = ()
-            addresses = self.iproute.get_addr(family=2)
+            links = ()
+            links = self.iproute.get_links(family=2)
 
             print("Added interfaces:")
-            for address in addresses:
-                ip = address.get_attrs('IFA_ADDRESS')[0]
-                prefix = address['prefixlen']
-                intLabel = address.get_attrs('IFA_LABEL')[0]
-                link = self.iproute.get_links(ifname=intLabel)[0]
-                mac = [x[1]
-				     for x in link["attrs"] if x[0] == 'IFLA_ADDRESS'][0]
-                if intLabel != "lo":
-                    print(f'{ip}/{prefix} [{intLabel}: {mac}]')
-                    self.interfaces.append(Interface(ipaddress.IPv4Interface(f'{ip}/{prefix}'), intLabel, mac))
+            for link in links:
+                mac = link.get_attrs('IFLA_ADDRESS')[0]
+                ifName = link.get_attrs('IFLA_IFNAME')[0]
+                
+                address = self.iproute.get_addr(label=ifName)
+                if address:
+                    address = address[0]
+                    ip = [x[1]
+                        for x in address['attrs'] if x[0] == 'IFA_ADDRESS'][0]
+                    prefix = address['prefixlen']
+                    ipv4 = ipaddress.IPv4Interface(f'{ip}/{prefix}')
+                else:
+                    ip = "-"
+                    prefix = "-"
+                    ipv4 = None
+                if ifName != "lo":
+                    print(f'{ip}/{prefix} [{ifName}: {mac}]')
+                    self.interfaces.append(Interface(ipv4, ifName, mac))
 
     def createSocket(self, interface):
-        intLabel = interface.label
+        intLabel = interface.name
         # Create socket on interface
         for sock in self.activeSockets:
             if sock.getsockname() == (intLabel, 0):
@@ -58,7 +67,7 @@ class Router():
         return True
 
     def closeSocket(self, interface):
-        intLabel = interface.label
+        intLabel = interface.name
         # Closing socket with 'ip' on 'port'
         for sock in self.activeSockets:
             if sock.getsockname() == (intLabel, 0):
@@ -134,10 +143,10 @@ class Router():
         return False
 
     def runLLDP(self):
-        if self.enableLLDP != False:
+        if self.enableLLDP == False:
             self.enableLLDP = True
             # Creating LLDP class for LLDP protocol
-            self.lldp = LLDP(self.activeSockets)
+            self.lldp = LLDP()
             # Creating sockets for every interface
             for interface in self.interfaces:
                 self.createSocket(interface)
@@ -149,6 +158,11 @@ class Router():
                 # Sending LLDP packets
                 tSend = threading.Thread(target=self.lldp.sendPacket, args=(interface,))
                 tSend.start()
+        return True
     
     def getLLDPTable(self):
-        return self.lldp.getLLDPTable()
+        if self.enableLLDP == True:
+            self.lldp.printLLDPTable()
+            return self.lldp.getLLDPTable()
+        else:
+            return None

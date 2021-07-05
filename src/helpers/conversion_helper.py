@@ -1,5 +1,15 @@
 from ipaddress import IPv4Network
 
+# LLDP Capability codes
+LLDP_CAP_OTHER          = 0x0001
+LLDP_CAP_REPEATER       = 0x0002
+LLDP_CAP_BRIDGE         = 0x0004
+LLDP_CAP_AP             = 0x0008
+LLDP_CAP_ROUTER         = 0x0010
+LLDP_CAP_TELEPHONE      = 0x0020
+LLDP_CAP_CABLE          = 0x0040
+LLDP_CAP_STATION        = 0x0080
+
 def macToBytes(mac):
     return bytes.fromhex(mac.replace(':', ''))
 
@@ -12,3 +22,26 @@ def macFromBytes(bytesMAC):
 
 def maskToPrefix(mask):
     return IPv4Network(f'0.0.0.0/{mask}').prefixlen
+
+def capabilityFromBytes(bytesCAP):
+    capability = bytesCAP.hex()
+    enabledCAP = capability[2:]
+    if enabledCAP == LLDP_CAP_OTHER:
+        stringCAP = "O"
+    elif enabledCAP == LLDP_CAP_REPEATER:
+        stringCAP = "P"
+    elif enabledCAP == LLDP_CAP_BRIDGE:
+        stringCAP = "B"
+    elif enabledCAP == LLDP_CAP_AP:
+        stringCAP = "W"
+    elif enabledCAP == LLDP_CAP_ROUTER:
+        stringCAP = "R"
+    elif enabledCAP == LLDP_CAP_TELEPHONE:
+        stringCAP = "T"
+    elif enabledCAP == LLDP_CAP_CABLE:
+        stringCAP = "C"
+    elif enabledCAP == LLDP_CAP_STATION:
+        stringCAP = "S"
+    else:
+        stringCAP = "-"
+    return stringCAP
