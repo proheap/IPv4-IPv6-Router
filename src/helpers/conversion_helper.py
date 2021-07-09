@@ -1,14 +1,14 @@
 from ipaddress import IPv4Network
 
 # LLDP Capability codes
-LLDP_CAP_OTHER          = 0x0001
-LLDP_CAP_REPEATER       = 0x0002
-LLDP_CAP_BRIDGE         = 0x0004
-LLDP_CAP_AP             = 0x0008
-LLDP_CAP_ROUTER         = 0x0010
-LLDP_CAP_TELEPHONE      = 0x0020
-LLDP_CAP_CABLE          = 0x0040
-LLDP_CAP_STATION        = 0x0080
+LLDP_CAP_OTHER          = '0001'
+LLDP_CAP_REPEATER       = '0002'
+LLDP_CAP_BRIDGE         = '0004'
+LLDP_CAP_AP             = '0008'
+LLDP_CAP_ROUTER         = '0010'
+LLDP_CAP_TELEPHONE      = '0020'
+LLDP_CAP_CABLE          = '0040'
+LLDP_CAP_STATION        = '0080'
 
 def macToBytes(mac):
     return bytes.fromhex(mac.replace(':', ''))

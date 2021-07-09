@@ -103,4 +103,4 @@ class LLDP_entry(object):
         return jsonLLDPEntry
 
     def print(self):
-        print(f'{self.deviceID}\t{self.localInt}\t{self.holdtime}\t\t{self.capability}\t{self.portID}')
+        print(f'{self.deviceID}\t{self.localInt}\t\t{self.holdtime}\t\t{self.capability}\t{self.portID}')

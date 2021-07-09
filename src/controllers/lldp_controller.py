@@ -10,7 +10,7 @@ class LLDP():
 
     def addEntryToLLDPTable(self, entryLLDP):
         for entry in self.lldpTable:
-            if entry.mac == entryLLDP.mac:
+            if entry.deviceID == entryLLDP.mac:
                 return False
         self.lldpTable.append(entryLLDP)
         return True
