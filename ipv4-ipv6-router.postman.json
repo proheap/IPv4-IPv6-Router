@@ -1,0 +1,195 @@
+{
+	"info": {
+		"_postman_id": "57c68ac8-8184-4c20-b4de-d6ee98b1bd3f",
+		"name": "IPv4 and IPv6 Router with LLDP",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add IPv4 route to routing table",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ip\": \"10.0.0.0\",\n    \"mask\": \"255.255.0.0\",\n    \"nextHop\": \"192.168.1.100\",\n    \"metric\": 1500\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/route/ipv4/add",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"route",
+						"ipv4",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete IPv4 route from routing table",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ip\": \"10.0.0.0\",\n    \"mask\": \"255.255.0.0\",\n    \"nextHop\": \"192.168.1.100\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/route/ipv4/delete",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"route",
+						"ipv4",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add IPv6 route to routing table",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ip\": \"2001:0:0:10::2\",\n    \"prefix\": 128,\n    \"nextHop\": \"fe80::a00:27ff:fead:dad8\",\n    \"metric\": 256\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/route/ipv6/add",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"route",
+						"ipv6",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete IPv6 route from routing table",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ip\": \"2001:0:0:10::2\",\n    \"prefix\": \"128\",\n    \"nextHop\": \"fe80::a00:27ff:fead:dad8\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/route/ipv6/delete",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"route",
+						"ipv6",
+						"delete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Run LLDP protocol",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/lldp/run",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"lldp",
+						"run"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get LLDP table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}:{{port}}/api/router/lldp/table",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"router",
+						"lldp",
+						"table"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
