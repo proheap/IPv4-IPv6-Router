@@ -6,10 +6,8 @@
 IPv4 and IPv6 router with the possibility of static paths and support for the CDP/LLDP protocol.
 
 ---
-### AUTHORS
+### AUTHOR
 - *Martin Mišík*
-- *Mária Činčuráková*
-- *Michal Hraška*
 
 ### VERSION
 - *1.0*
